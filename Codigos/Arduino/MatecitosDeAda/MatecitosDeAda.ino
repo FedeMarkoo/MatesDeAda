@@ -12,6 +12,7 @@ int accion;
 #define depositadorAzucar 	44;
 #define depositadorYerba	45;
 #define botonCantidades		46;
+#define proximidad 			47;
 
 // objetos
 SoftwareSerial bt(20, 21); // RX, TX
@@ -38,7 +39,7 @@ int correccionAgua;
 float calibration_factor = 2230;
 
 void setup() {
-  accion = SIN_ACCION;
+  accion = ESPERAR_MATE;
   bt.begin(9600);
   bt.print("AT + NAMELosMatesDeAda");
   bt.print("AT + PINpass");
@@ -46,6 +47,7 @@ void setup() {
   //entradas
   pinMode(btPairing			  	, INPUT);
   pinMode(botonCantidades		, INPUT);
+  pinMode(proximidad			, INPUT);
   //salidas
   pinMode(alimentacionBT      	, OUTPUT);
   pinMode(depositadorYerba	  	, OUTPUT);
@@ -84,8 +86,10 @@ void loop() {
           if (!cantYerbaPorMate && ((bt.available() > 0 && bt.read()) || digitalRead(botonCantidades)))
             cantYerbaPorMate = cantYerbaEnMate;
         }
-      } else
+      } else {
+        analogWrite(depositadorYerba, 0);
         accion = PONER_AZUCAR;
+      }
       break;
 
     case PONER_AZUCAR:
@@ -94,9 +98,10 @@ void loop() {
         if (!cantAzucarPorMate && ((bt.available() > 0 && bt.read()) || digitalRead(botonCantidades)))
           cantAzucarPorMate = cantAzucarEnMate;
       }
-      else
+      else {
+        analogWrite(depositadorAzucar, 0);
         accion = SERVIR_AGUA;
-      break;
+      } break;
 
     case SERVIR_AGUA:
       if (cantAguaPorMate > cantAguaEnMate || !cantAguaPorMate) {
@@ -104,11 +109,16 @@ void loop() {
           cantAguaPorMate = cantAguaEnMate;
         analogWrite(depositadorAgua, porcentaje(50)); //0-255
       }
-      else
+      else {
+        analogWrite(depositadorAgua, 0);
         accion = ESPERAR_MATE;
-      break;
+      } break;
   }
+
   seteoVaribles();
+
+  if (btConectado)
+    enviarInfo();
 }
 
 
@@ -120,7 +130,7 @@ void seteoVaribles() {
   int azucarDiponibleTemp = azucarDiponible;
   int yerbaDiponibleTemp = yerbaDiponible;
   int aguaDiponibleTemp = aguaDiponible;
-  
+
   azucarDiponible = leerBalanza(balAzucar) + correccionAzucar;
   yerbaDiponible = leerBalanza(balYerba) + correccionYerba;
   aguaDiponible = leerBalanza(balAgua) + correccionAgua;
@@ -133,6 +143,8 @@ void seteoVaribles() {
 
   if (aguaDiponibleTemp)
     cantAguaEnMate = aguaDiponibleTemp - aguaDiponible;
+
+  sensorProximidad = digitalRead(proximidad);
 }
 
 
