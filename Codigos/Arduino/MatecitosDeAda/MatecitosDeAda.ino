@@ -10,8 +10,8 @@ int accion;
 #define alimentacionBT      23;
 #define btPairing           49;
 #define depositadorAzucar 	44;
-#define depositadorYerba	45;
-#define botonCantidades		46;
+#define depositadorYerba    45;
+#define botonCantidades     46;
 
 // objetos
 SoftwareSerial bt(20, 21); // RX, TX
