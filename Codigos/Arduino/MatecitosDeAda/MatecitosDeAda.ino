@@ -7,12 +7,13 @@ int accion;
 #define SERVIR_AGUA    4;
 
 //pines
-#define alimentacionBT      23;
-#define btPairing           49;
-#define depositadorAzucar 	44;
-#define depositadorYerba	45;
-#define botonCantidades		46;
-#define proximidad 			47;
+#define alimentacionBT        23;
+#define btPairing             49;
+#define depositadorAzucar 	  44;
+#define depositadorYerba      45;
+#define depositadorAgua       46;
+#define botonCantidades		    47;
+#define proximidad 			      48;
 
 // objetos
 SoftwareSerial bt(20, 21); // RX, TX
